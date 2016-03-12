@@ -58,6 +58,9 @@ ApplicationWindow {
         onEditDot: {
             loader.item.children[1].children[2].addCoordinate(mybd.dot);
         }
+//        onEditLeft_sync: {
+//            loader.item.children[0].children[1].text = left_sync;
+//        }
     }
     PositionSource {
         id: posit
@@ -82,7 +85,11 @@ ApplicationWindow {
                         text: qsTr("Если маршрут плохо вывелся")
                         onClicked: {
                             puti.addCoordinate(puti.path[puti.path.length-1]);
+                            mybd.sync("2016-03-07 02:17:34");
                         }
+                    }
+                    Text {
+                        text: mybd.left_sync
                     }
             }
 

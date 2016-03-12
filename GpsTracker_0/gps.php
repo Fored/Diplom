@@ -59,15 +59,15 @@ print(json_encode($output));
 }
 
 
-if($action == insert && $author != null && $client != null && $text != null){ // если действие INSERT и есть все что нужно
+if($action == insert && $user != null && $datetime != null && $latitude != null && $longitude != null){ // если действие INSERT и есть все что нужно
 
 // время = время сервера а не клиента !
-$current_time = round(microtime(1) * 1000);
+//$current_time = round(microtime(1) * 1000);
 // пример передачи скрипту данных:
 // http://andreidanilevich.comoj.com/chat.php?action=insert&author=author&client=client&text=text
 // вставим строку с переданными параметрами
-mysql_query("INSERT INTO `chat`(`author`,`client`,`data`,`text`) VALUES ('$author','$client','$current_time','$text')");
-
+mysql_query("INSERT INTO `coordinate`(`user`,`datetime`,`latitude`,`longitude`) VALUES ('$user','$datetime','$latitude','$longitude')");
+print ("ok");
 }
 
 
