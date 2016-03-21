@@ -6,7 +6,8 @@ import QtQuick.Layouts 1.1
 import QtQuick.Window 2.2
 import QtQuick.Controls.Styles 1.4
 import QtPositioning 5.3
-import ModuleBD 1.0
+//import ModuleBD 1.0
+import ServerBD 1.0
 
 
 ApplicationWindow {
@@ -53,21 +54,22 @@ ApplicationWindow {
             anchors.bottom: parent.bottom
             sourceComponent: map
         }
-    MyBd {
+    ServBd {
         id: mybd
         onEditDot: {
             loader.item.children[1].children[2].addCoordinate(mybd.dot);
         }
-//        onEditLeft_sync: {
-//            loader.item.children[0].children[1].text = left_sync;
-//        }
     }
+
     PositionSource {
         id: posit
         active: true
         onPositionChanged: {
             mybd.recordDot(1, Qt.formatDateTime(position.timestamp, "yyyy-MM-dd hh:mm:ss"),
                            position.coordinate.latitude, position.coordinate.longitude);
+            //mybd.server_sync();
+            //loader.item.children[1].children[2].addCoordinate(mybd.dot)
+            //loader.item.children[1].children[2].addCoordinate(loader.item.children[1].children[2].path[loader.item.children[1].children[2].path.length-1]);
             //karta.center = position.coordinate;
             //bd_ent.record(position.coordinate.latitude, position.coordinate.longitude, Qt.formatDateTime(position.timestamp, "yyyy-MM-dd hh:mm:ss"), bd_ent.acc);
         }
@@ -85,7 +87,10 @@ ApplicationWindow {
                         text: qsTr("Если маршрут плохо вывелся")
                         onClicked: {
                             puti.addCoordinate(puti.path[puti.path.length-1]);
-                            mybd.sync("2016-03-07 02:17:34");
+                            //mybd.sync("2015-03-07 02:17:34");
+                            //console.log(mybd.test());
+                            //mybd.get_max_on_server(1);
+                            //mybd.server_sync();
                         }
                     }
                     Text {
@@ -233,7 +238,7 @@ ApplicationWindow {
                 text: qsTr("Построить")
                 onClicked: {
                     loader.sourceComponent = map;
-                    mybd.route(1, "2016-03-07 01:00:50", "2016-03-08 01:29:14");
+                    mybd.route(1, "2016-03-07 01:00:50", "2016-04-08 01:29:14");
                     loader.item.children[1].center = loader.item.children[1].children[2].path[0];
                 }
             }

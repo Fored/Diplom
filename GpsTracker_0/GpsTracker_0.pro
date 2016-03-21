@@ -3,7 +3,8 @@ TEMPLATE = app
 QT += qml quick widgets positioning sql
 
 SOURCES += main.cpp \
-    my_bd.cpp
+    my_bd.cpp \
+    server_bd.cpp
 
 RESOURCES += qml.qrc
 
@@ -16,5 +17,6 @@ include(deployment.pri)
 DISTFILES +=
 
 HEADERS += \
-    my_bd.h
+    my_bd.h \
+    server_bd.h
 

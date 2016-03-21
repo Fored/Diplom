@@ -28,7 +28,6 @@ if (isset($_GET["datetime"])) {
 if (isset($_GET["latitude"])) { 
     $latitude = $_GET['latitude'];
 }
-// ------------------------------------------- если action=select тогда получим еще data - от после какого времени передавать ответ
 if (isset($_GET["longitude"])) { 
     $longitude = $_GET['longitude'];
 }
@@ -41,20 +40,20 @@ mysql_set_charset('utf8'); // кодировка
 // ------------------------------------------------------------ обрабатываем запрос если он был
 if($action == select){ // если действие SELECT
 
-if($data == null){
-// выберем из таблицы chat ВСЕ данные что есть и вернем их в JSON
-$q=mysql_query("SELECT * FROM coordinate");
+	if($data == null){
+	// выберем из таблицы chat ВСЕ данные что есть и вернем их в JSON
+	$q=mysql_query("SELECT * FROM coordinate");
 
 
-}else{
-	
-// выберем из таблицы chat ВСЕ данные ПОЗНЕЕ ОПРЕДЕЛЕННОГО ВРЕМЕНИ и вернем их в JSON
-$q=mysql_query("SELECT * FROM chat WHERE data > $data");	
-	
-}
-while($e=mysql_fetch_assoc($q))
-        $output[]=$e;
-print(json_encode($output));
+	}else{
+		
+	// выберем из таблицы chat ВСЕ данные ПОЗНЕЕ ОПРЕДЕЛЕННОГО ВРЕМЕНИ и вернем их в JSON
+	$q=mysql_query("SELECT * FROM chat WHERE data > $data");	
+		
+	}
+	while($e=mysql_fetch_assoc($q))
+			$output[]=$e;
+	print(json_encode($output));
 
 }
 
@@ -70,11 +69,20 @@ mysql_query("INSERT INTO `coordinate`(`user`,`datetime`,`latitude`,`longitude`) 
 print ("ok");
 }
 
+if (empty($action)){
+print ("ok");
+}
 
 if($action == delete){ // если действие DELETE
 // полностью обнулим таблицу записей
 mysql_query("TRUNCATE TABLE `chat`");	
 }
 
+if($action == max) {
+	$q=mysql_query("SELECT MAX(datetime) FROM coordinate WHERE user = '$user'");
+	while($e=mysql_fetch_assoc($q))
+			$output[]=$e;
+	print(json_encode($output));
+}
 mysql_close();
 ?>
