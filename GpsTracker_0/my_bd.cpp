@@ -6,21 +6,13 @@ my_bd::my_bd(QObject *parent) :
 {
     left_sync = 0;
     db_record = QSqlDatabase::addDatabase("QSQLITE","OTHER");
-    //db_record.setDatabaseName("/storage/emulated/0/Download/my_bd.db");
     db_record.setDatabaseName("my_bd.db");
     db_record.open();
     db_route = QSqlDatabase::database("OTHER");
     q_record = QSqlQuery("", db_record);
     q_route = QSqlQuery("", db_route);
-    q_route.prepare("CREATE TABLE IF NOT EXISTS coordinate (id INTEGER, datatime TEXT, latitude REAL, longitude REAL)");
-    q_route.exec();
-    q_route.exec("CREATE TABLE IF NOT EXISTS sync (id INTEGER, datetime TEXT, latitude REAL, longitude REAL)");
-    //q_route.exec("SELECT MAX(datatime) FROM coordinate");
-    //q_route.next();
-
-    //max_on_my_bd = q_route.value(0).toString();
-
-    //sync("2016-03-07 02:17:34");
+    q_route.exec("CREATE TABLE IF NOT EXISTS coordinate (id INTEGER, datatime TEXT, latitude REAL, longitude REAL)");
+    q_route.exec("CREATE TABLE IF NOT EXISTS sync (datetime TEXT, latitude REAL, longitude REAL)");
 
 }
 
@@ -43,8 +35,8 @@ void my_bd::recordDot(int user, QString cur_time, double latitude, double longit
         q_record.prepare(QString("INSERT INTO coordinate (id, datatime, latitude, longitude) "
                   "VALUES (%1, '%2', %3, %4)").arg(user).arg(cur_time).arg(latitude).arg(longitude));
         q_record.exec();
-        q_record.prepare(QString("INSERT INTO sync (id, datatime, latitude, longitude) "
-                  "VALUES ('%1', %2, %3, %4)").arg(user).arg(cur_time).arg(latitude).arg(longitude));
+        q_record.prepare(QString("INSERT INTO sync (datetime, latitude, longitude) "
+                  "VALUES ('%1', %2, %3)").arg(cur_time).arg(latitude).arg(longitude));
         q_record.exec();
 
     }

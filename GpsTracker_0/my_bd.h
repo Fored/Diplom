@@ -25,6 +25,8 @@ public:
     int left_sync;
     int getLeft_sync();
     QString max_on_my_bd;
+    QSqlQuery q_record;
+    QSqlQuery q_route;
 
 signals:
     void editDot();
@@ -37,8 +39,8 @@ public slots:
 private:
     QGeoCoordinate dot;
     QSqlDatabase db_record;
-    QSqlQuery q_record;
-    QSqlQuery q_route;
+
+
 };
 
 #endif // MY_BD_H

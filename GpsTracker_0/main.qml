@@ -67,7 +67,7 @@ ApplicationWindow {
         onPositionChanged: {
             mybd.recordDot(1, Qt.formatDateTime(position.timestamp, "yyyy-MM-dd hh:mm:ss"),
                            position.coordinate.latitude, position.coordinate.longitude);
-            //mybd.server_sync();
+            mybd.server_sync();
             //loader.item.children[1].children[2].addCoordinate(mybd.dot)
             //loader.item.children[1].children[2].addCoordinate(loader.item.children[1].children[2].path[loader.item.children[1].children[2].path.length-1]);
             //karta.center = position.coordinate;
@@ -88,9 +88,9 @@ ApplicationWindow {
                         onClicked: {
                             puti.addCoordinate(puti.path[puti.path.length-1]);
                             //mybd.sync("2015-03-07 02:17:34");
-                            //console.log(mybd.test());
+                            console.log(mybd.test());                            
                             //mybd.get_max_on_server(1);
-                            //mybd.server_sync();
+                            //mybd.sync();
                         }
                     }
                     Text {

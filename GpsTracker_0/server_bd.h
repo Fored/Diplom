@@ -9,6 +9,7 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QList>
+#include <QTimer>
 #include "my_bd.h"
 
 
@@ -23,24 +24,29 @@ public:
 
 
 
+
 //signals:
 
 public slots:
-    void insertDotRes(QNetworkReply *reply);
-    void sync(QString datetime);//Закачиваем данные из локальной бд на серверную бд
+    void insertDotRes(QNetworkReply *reply = 0);
+    void sync();//Закачиваем данные из локальной бд на серверную бд
     void get_max_on_server(int u);
     void get_max_on_serverRes(QNetworkReply *reply);
     int test();
     void server_sync();
+    void onlineRes(QNetworkReply *reply);
+    void onlineRes();
 
 private:
     QSqlQuery q_sync;
     QNetworkAccessManager *networkManager;
     QNetworkAccessManager *net_max_serv;
-    QNetworkAccessManager *network_sync;
+    //QNetworkAccessManager *network_sync;
+    QNetworkAccessManager *network_online;
     QString max_on_server;
     bool online;
     bool server_ready;
+    QTimer *timer;
 };
 
 #endif // SERVER_BD_H
