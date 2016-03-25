@@ -28,13 +28,16 @@ public:
     QSqlQuery q_record;
     QSqlQuery q_route;
 
+
 signals:
     void editDot();
     void editLeft_sync();
 
 public slots:
+    void setProfile(int id, QString log, QString pass);
     void recordDot(int user, QString cur_time, double latitude, double longitude);
     void route (int user, QString start, QString end);
+    void exit();
 
 private:
     QGeoCoordinate dot;

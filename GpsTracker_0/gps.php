@@ -31,6 +31,12 @@ if (isset($_GET["latitude"])) {
 if (isset($_GET["longitude"])) { 
     $longitude = $_GET['longitude'];
 }
+if (isset($_GET["login"])) { 
+    $login = $_GET['login'];
+}
+if (isset($_GET["password"])) { 
+    $password = $_GET['password'];
+}
 
 
 
@@ -84,5 +90,20 @@ if($action == max) {
 			$output[]=$e;
 	print(json_encode($output));
 }
+
+if($action == login) {
+	$q=mysql_query("SELECT COUNT(*), id FROM Users WHERE login = '$login' AND password = '$password'");
+	while($e=mysql_fetch_assoc($q))
+			$output[]=$e;
+	print(json_encode($output));
+}
+
+if($action == signup) {
+	$q=mysql_query("SELECT signup('$login', '$password')");
+	while($e=mysql_fetch_assoc($q))
+			$output[]=$e;
+	print(json_encode($output));
+}
+
 mysql_close();
 ?>

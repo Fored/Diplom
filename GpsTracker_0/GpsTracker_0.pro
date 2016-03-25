@@ -4,7 +4,8 @@ QT += qml quick widgets positioning sql
 
 SOURCES += main.cpp \
     my_bd.cpp \
-    server_bd.cpp
+    server_bd.cpp \
+    welcome.cpp
 
 RESOURCES += qml.qrc
 
@@ -18,5 +19,6 @@ DISTFILES +=
 
 HEADERS += \
     my_bd.h \
-    server_bd.h
+    server_bd.h \
+    welcome.h
 

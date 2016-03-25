@@ -15,6 +15,20 @@ server_bd::server_bd(QObject *parent) : my_bd(parent)
     server_ready = true;
     timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), this, SLOT(onlineRes()));
+    q_route.exec("SELECT COUNT(*) FROM profile");
+    q_route.next();
+    if (q_route.value(0).toInt() == 1)
+    {
+        q_route.exec("SELECT id FROM profile");
+        q_route.next();
+        user = q_route.value(0).toInt();
+        qDebug() << user;
+    }
+    else
+    {
+        user = 0;
+    }
+
     //q_route.exec("INSERT INTO sync (datetime) VALUES ('45')");
     //sync("2016-03-07 02:17:34");
 
@@ -43,7 +57,7 @@ void server_bd::sync()
                             "datetime <= '%2'").arg(max_on_my_bd));
     q_sync.exec();
     q_sync.next();
-    insertDot(1, q_sync.value(0).toString(), q_sync.value(1).toString(),q_sync.value(2).toString());
+    insertDot(user, q_sync.value(0).toString(), q_sync.value(1).toString(),q_sync.value(2).toString());
     }
 }
 
@@ -122,6 +136,16 @@ void server_bd::insertDot(int user, QString cur_time, QString latitude, QString 
     networkManager->get(QNetworkRequest(url));
 }
 
+int server_bd::getUser()
+{
+    return user;
+}
+
+void server_bd::setUser(int u)
+{
+    user = u;
+}
+
 void server_bd::insertDotRes(QNetworkReply *reply)
 {
     if(!reply->error()){
@@ -129,7 +153,7 @@ void server_bd::insertDotRes(QNetworkReply *reply)
         emit editLeft_sync();
         if (q_sync.next())
         {
-            insertDot(1, q_sync.value(0).toString(), q_sync.value(1).toString(),q_sync.value(2).toString());
+            insertDot(user, q_sync.value(0).toString(), q_sync.value(1).toString(),q_sync.value(2).toString());
         }
         else
         {
@@ -185,6 +209,7 @@ void server_bd::get_max_on_serverRes(QNetworkReply *reply)
         online = false;
     }
     server_ready = true;
+    reply->deleteLater();
 }
 
 

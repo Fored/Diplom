@@ -3,12 +3,9 @@
 #include <QtSql>
 #include <QSqlQuery>
 #include <QDesktopServices>
-#include <QNetworkConfigurationManager>
-#include <QNetworkSession>
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
-#include <QList>
 #include <QTimer>
 #include "my_bd.h"
 
@@ -16,16 +13,17 @@
 class server_bd : public my_bd
 {
     Q_OBJECT
+    Q_PROPERTY(int user READ getUser WRITE setUser/*NOTIFY loginOk*/)
 
 public:
     explicit server_bd(QObject *parent = 0);
 
     void insertDot(int user, QString cur_time, QString latitude, QString longitude);
-
-
-
+    int getUser();
+    void setUser(int u);
 
 //signals:
+
 
 public slots:
     void insertDotRes(QNetworkReply *reply = 0);
@@ -37,6 +35,7 @@ public slots:
     void onlineRes(QNetworkReply *reply);
     void onlineRes();
 
+
 private:
     QSqlQuery q_sync;
     QNetworkAccessManager *networkManager;
@@ -47,6 +46,8 @@ private:
     bool online;
     bool server_ready;
     QTimer *timer;
+    bool login;
+    int user;
 };
 
 #endif // SERVER_BD_H

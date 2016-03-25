@@ -13,7 +13,7 @@ my_bd::my_bd(QObject *parent) :
     q_route = QSqlQuery("", db_route);
     q_route.exec("CREATE TABLE IF NOT EXISTS coordinate (id INTEGER, datatime TEXT, latitude REAL, longitude REAL)");
     q_route.exec("CREATE TABLE IF NOT EXISTS sync (datetime TEXT, latitude REAL, longitude REAL)");
-
+    q_route.exec("CREATE TABLE IF NOT EXISTS profile (id INTEGER, login TEXT, pass TEXT)");
 }
 
 QGeoCoordinate my_bd::getDot()
@@ -24,6 +24,13 @@ QGeoCoordinate my_bd::getDot()
 int my_bd::getLeft_sync()
 {
     return left_sync;
+}
+
+void my_bd::setProfile(int id, QString log, QString pass)
+{
+    q_route.prepare(QString("INSERT INTO profile (id, login, pass) VALUES (%1, '%2', '%3')")
+                    .arg(id).arg(log).arg(pass));
+    q_route.exec();
 }
 
 void my_bd::recordDot(int user, QString cur_time, double latitude, double longitude)
@@ -56,4 +63,9 @@ void my_bd::route(int user, QString start, QString end)
     }
 
     //emit editDots();
+}
+
+void my_bd::exit()
+{
+    q_route.exec("DELETE FROM profile");
 }
