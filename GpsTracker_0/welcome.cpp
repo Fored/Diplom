@@ -8,6 +8,7 @@ welcome::welcome(QObject *parent) : QObject(parent)
     connect(timer, SIGNAL(timeout()), this, SLOT(timeout()));
     network_signup = new QNetworkAccessManager(this);
     connect(network_signup, SIGNAL(finished(QNetworkReply*)), this, SLOT(signupRes(QNetworkReply*)));
+    mainUrl.setUrl("http://fored.esy.es/gps.php");
 }
 
 void welcome::loginRes(QNetworkReply *reply)
@@ -49,7 +50,7 @@ void welcome::timeout()
 
 void welcome::signup(QString log, QString pass)
 {
-    QUrl url("http://foredev.heliohost.org/gps.php");
+    QUrl url(mainUrl);
     QUrlQuery urlq;
     urlq.addQueryItem("action", "signup");
     urlq.addQueryItem("login", log);
@@ -97,7 +98,7 @@ int welcome::getUser()
 
 void welcome::login(QString log, QString pass)
 {
-    QUrl url("http://foredev.heliohost.org/gps.php");
+    QUrl url(mainUrl);
     QUrlQuery urlq;
     urlq.addQueryItem("action", "login");
     urlq.addQueryItem("login", log);

@@ -5,7 +5,9 @@ QT += qml quick widgets positioning sql
 SOURCES += main.cpp \
     my_bd.cpp \
     server_bd.cpp \
-    welcome.cpp
+    welcome.cpp \
+    vk_login.cpp \
+    users.cpp
 
 RESOURCES += qml.qrc
 
@@ -20,5 +22,7 @@ DISTFILES +=
 HEADERS += \
     my_bd.h \
     server_bd.h \
-    welcome.h
+    welcome.h \
+    vk_login.h \
+    users.h
 

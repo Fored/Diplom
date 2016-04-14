@@ -22,7 +22,8 @@ public:
     int getUser();
     void setUser(int u);
 
-//signals:
+signals:
+    void routeServResEnd();
 
 
 public slots:
@@ -34,20 +35,23 @@ public slots:
     void server_sync();
     void onlineRes(QNetworkReply *reply);
     void onlineRes();
+    void routeServ(int u, QString min, QString max);
+    void routeServRes(QNetworkReply *reply);
 
 
 private:
     QSqlQuery q_sync;
     QNetworkAccessManager *networkManager;
     QNetworkAccessManager *net_max_serv;
-    //QNetworkAccessManager *network_sync;
     QNetworkAccessManager *network_online;
+    QNetworkAccessManager *network_select;
     QString max_on_server;
     bool online;
     bool server_ready;
     QTimer *timer;
     bool login;
     int user;
+    QUrl mainUrl;
 };
 
 #endif // SERVER_BD_H

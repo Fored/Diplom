@@ -10,6 +10,8 @@ server_bd::server_bd(QObject *parent) : my_bd(parent)
     connect(net_max_serv, SIGNAL(finished(QNetworkReply*)), this, SLOT(get_max_on_serverRes(QNetworkReply*)));
     network_online = new QNetworkAccessManager(this);
     connect(network_online, SIGNAL(finished(QNetworkReply*)), this, SLOT(onlineRes(QNetworkReply*)));
+    network_select = new QNetworkAccessManager(this);
+    connect(network_select, SIGNAL(finished(QNetworkReply*)), this, SLOT(routeServRes(QNetworkReply*)));
     online = false;
     max_on_server = "null";
     server_ready = true;
@@ -28,7 +30,7 @@ server_bd::server_bd(QObject *parent) : my_bd(parent)
     {
         user = 0;
     }
-
+    mainUrl.setUrl("http://fored.esy.es/gps.php");
     //q_route.exec("INSERT INTO sync (datetime) VALUES ('45')");
     //sync("2016-03-07 02:17:34");
 
@@ -80,8 +82,7 @@ void server_bd::server_sync()
         if (online == false)
         {
             server_ready = false;
-            //connect(network_online, SIGNAL(finished(QNetworkReply*)), this, SLOT(onlineRes(QNetworkReply*)));
-            QUrl url("http://foredev.heliohost.org/gps.php");
+            QUrl url(mainUrl);
             network_online->get(QNetworkRequest(url));
             timer->start(10000);
         }
@@ -89,7 +90,7 @@ void server_bd::server_sync()
         {
             if (max_on_server == "null")
             {
-                get_max_on_server(1);
+                get_max_on_server(user);
             }
             else
             {
@@ -121,9 +122,38 @@ void server_bd::onlineRes()
     qDebug() << "offline->timeout";
 }
 
+void server_bd::routeServ(int u, QString min, QString max)
+{
+    QUrl url(mainUrl);
+    QUrlQuery urlq;
+    urlq.addQueryItem("action", "select");
+    urlq.addQueryItem("user", QString::number(u));
+    urlq.addQueryItem("min", min);
+    urlq.addQueryItem("max", max);
+    url.setQuery(urlq);
+    network_select->get(QNetworkRequest(url));
+}
+
+void server_bd::routeServRes(QNetworkReply *reply)
+{
+    if(!reply->error()){
+        QJsonDocument document = QJsonDocument::fromJson(reply->readAll());
+        // Преобразуем документ в массив
+        QJsonArray ja = document.array();
+        for(int i = 0; i < ja.count(); i++)
+        {
+            QJsonObject subtree = ja.at(i).toObject();
+            dot = QGeoCoordinate(subtree.value("latitude").toString().toDouble(), subtree.value("longitude").toString().toDouble());
+            emit editDot();
+        }
+    }
+    reply->deleteLater();
+    emit routeServResEnd();
+}
+
 void server_bd::insertDot(int user, QString cur_time, QString latitude, QString longitude)
 {
-    QUrl url("http://foredev.heliohost.org/gps.php");
+    QUrl url(mainUrl);
     QUrlQuery urlq;
     //Составляем запрос серверу на вставку точки
     urlq.addQueryItem("action", "insert");
@@ -179,7 +209,7 @@ void server_bd::insertDotRes(QNetworkReply *reply)
 void server_bd::get_max_on_server(int u)
 {
     server_ready = false;
-    QUrl url("http://foredev.heliohost.org/gps.php");
+    QUrl url(mainUrl);
     QUrlQuery urlq;
     urlq.addQueryItem("action", "max");
     urlq.addQueryItem("user", QString::number(u));

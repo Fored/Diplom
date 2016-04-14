@@ -4,7 +4,6 @@
 #include <QObject>
 #include <QtSql>
 #include <QGeoPositionInfo>
-#include <QQmlListProperty>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QNetworkRequest>
@@ -27,6 +26,7 @@ public:
     QString max_on_my_bd;
     QSqlQuery q_record;
     QSqlQuery q_route;
+    QGeoCoordinate dot;
 
 
 signals:
@@ -40,7 +40,7 @@ public slots:
     void exit();
 
 private:
-    QGeoCoordinate dot;
+
     QSqlDatabase db_record;
 
 

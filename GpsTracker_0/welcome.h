@@ -37,6 +37,9 @@ public slots:
     void timeout();
     void signup(QString log, QString pass);
     void signupRes(QNetworkReply *reply);
+
+private:
+    QUrl mainUrl;
 };
 
 #endif // WELCOME_H

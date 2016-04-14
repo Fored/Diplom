@@ -9,6 +9,8 @@ import QtPositioning 5.3
 //import ModuleBD 1.0
 import ServerBD 1.0
 import Welcome 1.0
+import Vk_login 1.0
+import Users 1.0
 
 
 ApplicationWindow {
@@ -32,12 +34,21 @@ ApplicationWindow {
         Menu {
             title: qsTr("File")
             MenuItem {
+                id: menu1
                 text: qsTr("История перемещения")
                 onTriggered: {
                     loader.sourceComponent = routes;
                 }
             }
             MenuItem {
+                id: menu2
+                text: qsTr("Найти друга")
+                onTriggered: {
+                    loader.sourceComponent = friend;
+                }
+            }
+            MenuItem {
+                id: menu3
                 text: qsTr("Выход из профиля")
                 onTriggered: {
                     mybd.exit();
@@ -52,6 +63,9 @@ ApplicationWindow {
         id: mybd
         onEditDot: {
             loader.item.children[1].children[2].addCoordinate(mybd.dot);
+        }
+        onRouteServResEnd: {
+            loader.item.children[1].center = loader.item.children[1].children[2].path[0];
         }
 
     }
@@ -81,6 +95,39 @@ ApplicationWindow {
 
     }
 
+    Vk_login {
+        id: vk
+    }
+    Users {
+        id: users
+        onEditLogin: {
+            loader.item.children[3].model.append({text: users.login});
+        }
+        onNotUser: {
+            notcorect.open();
+        }
+        onYesUser: {
+            yesuser.open();
+        }
+        onYesFollower: {
+            yesFollower.open();
+        }
+        onYesRequest: {
+            yesRequest.open();
+        }
+        onThisYou: {
+            thisYou.open();
+        }
+        onEditReq: {
+            loader.item.children[0].children[2].model.append({text: users.login});
+        }
+        onGiveAccessyesno: {
+            loader.item.children[0].children[2].model.clear();
+            loader.item.children[0].children[2].model.append({text: "Запросы от пользователей"});
+            users.getRequest(mybd.user);
+        }
+    }
+
     Loader {
             id: loader
             anchors.top: parent.top
@@ -93,16 +140,13 @@ ApplicationWindow {
     PositionSource {
         id: posit
         active: true
+        preferredPositioningMethods: PositionSource.SatellitePositioningMethods
         onPositionChanged: {
             if (mybd.user != 0) {
                 mybd.recordDot(mybd.user, Qt.formatDateTime(position.timestamp, "yyyy-MM-dd hh:mm:ss"),
                                position.coordinate.latitude, position.coordinate.longitude);
                 mybd.server_sync();
             }
-            //loader.item.children[1].children[2].addCoordinate(mybd.dot)
-            //loader.item.children[1].children[2].addCoordinate(loader.item.children[1].children[2].path[loader.item.children[1].children[2].path.length-1]);
-            //karta.center = position.coordinate;
-            //bd_ent.record(position.coordinate.latitude, position.coordinate.longitude, Qt.formatDateTime(position.timestamp, "yyyy-MM-dd hh:mm:ss"), bd_ent.acc);
         }
     }
     Component {
@@ -117,11 +161,12 @@ ApplicationWindow {
                     Button {
                         text: qsTr("Если маршрут плохо вывелся")
                         onClicked: {
-                            puti.addCoordinate(puti.path[puti.path.length-1]);
+                            //puti.addCoordinate(puti.path[puti.path.length-1]);
                             //mybd.sync("2015-03-07 02:17:34");
-                            console.log(mybd.test());                            
+                            //console.log(mybd.test());
                             //mybd.get_max_on_server(1);
-                            //mybd.sync();
+                            //vk.tie(mybd.user);
+                            users.request(3,3);
                         }
                     }
                     Text {
@@ -164,6 +209,11 @@ ApplicationWindow {
                 value: 17
                 orientation: Qt.Vertical
             }
+        Component.onCompleted: {
+            menu1.visible = true;
+            menu2.visible = true;
+            menu3.visible = true;
+        }
         }
 
     }
@@ -186,13 +236,13 @@ ApplicationWindow {
                           }
                     onClicked: {
                         tempDate.setDate(tempDate.getDate()-1)
-                        firstText.text = Qt.formatDate(tempDate, "dd.MM.yyyy")
+                        firstText.text = Qt.formatDate(tempDate, "yyyy.MM.dd")
                     }
                 }
                 Text {
                     id: firstText
                     font.pixelSize: dp(20)
-                    text: Qt.formatDate(tempDate, "dd.MM.yyyy")
+                    text: Qt.formatDate(tempDate, "yyyy.MM.dd")
                 }
                 Button {
                     id: more1
@@ -206,7 +256,7 @@ ApplicationWindow {
                           }
                     onClicked: {
                         tempDate.setDate(tempDate.getDate()+1)
-                        firstText.text = Qt.formatDate(tempDate, "dd.MM.yyyy")
+                        firstText.text = Qt.formatDate(tempDate, "yyyy.MM.dd")
                     }
                 }               
                 TextInput {
@@ -232,13 +282,13 @@ ApplicationWindow {
                           }
                     onClicked: {
                         tempDate.setDate(tempDate.getDate()-1)
-                        secondText.text = Qt.formatDate(tempDate, "dd.MM.yyyy")
+                        secondText.text = Qt.formatDate(tempDate, "yyyy.MM.dd")
                     }
                 }
                 Text {
                     id: secondText
                     font.pixelSize: dp(20)
-                    text: Qt.formatDate(tempDate, "dd.MM.yyyy")
+                    text: Qt.formatDate(tempDate, "yyyy.MM.dd")
                 }
                 Button {
                     id: more2
@@ -252,7 +302,7 @@ ApplicationWindow {
                           }
                     onClicked: {
                         tempDate.setDate(tempDate.getDate()+1)
-                        secondText.text = Qt.formatDate(tempDate, "dd.MM.yyyy")
+                        secondText.text = Qt.formatDate(tempDate, "yyyy.MM.dd")
                     }
                 }
                 TextInput {
@@ -265,15 +315,33 @@ ApplicationWindow {
 
             }
             Button {
+                id: construct
                 anchors.centerIn: parent
                 text: qsTr("Построить")
                 onClicked: {
                     loader.sourceComponent = map;
-                    mybd.route(1, "2016-03-07 01:00:50", "2016-04-08 01:29:14");
-                    loader.item.children[1].center = loader.item.children[1].children[2].path[0];
+                    mybd.routeServ(users.getUserId(comboBox1.currentIndex), firstText.text + " " + hour1.text, secondText.text + " " + hour2.text);
                 }
             }
+            ComboBox {
+                id: comboBox1
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.bottom: construct.top
+                model: model
+                activeFocusOnPress: true
+
+            }
+            ListModel {
+                id: model
+
+            }
+            Component.onCompleted: {
+                model.append({text: "Моя хронология"});
+                users.getFriend(mybd.user);
+            }
         }
+
+
     }
     Component {
         id: login
@@ -351,8 +419,59 @@ ApplicationWindow {
                         //frameSync: true // Синхронизация
                         running: false
                     }
+            Component.onCompleted: {
+                menu1.visible = false;
+                menu2.visible = false;
+                menu3.visible = false;
+            }
         }
     }
+    Component {
+        id: friend
+        Item {
+            ColumnLayout {
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.verticalCenter: parent.verticalCenter
+                spacing: 15
+                Rectangle {
+                    color: "#f4af58"
+                    Layout.alignment: Qt.AlignCenter
+                    Layout.preferredWidth: Screen.width/2
+                    Layout.preferredHeight: Screen.width/10
+                    TextInput {
+                        id: text1
+                        width: parent.width
+                        height: parent.height
+                        text: qsTr("fored")
+                        font.pixelSize: Screen.width/10
+                    }
+                }
+                Button {
+                    text: qsTr("Найти")
+                    onClicked: {
+                        users.findUser(text1.text, mybd.user);
+                    }
+                }
+                ComboBox {
+                    id: comboBox2
+                    model: model2
+                    onActivated:
+                        if (index > 0) {
+                            giveaccess.open();
+                        }
+                }
+            }
+            ListModel {
+                id: model2
+
+            }
+            Component.onCompleted: {
+                model2.append({text: "Запросы от пользователей"});
+                users.getRequest(mybd.user);
+            }
+        }
+    }
+
     MessageDialog {
         id: notnetwork
         title: "Нет связи"
@@ -367,6 +486,46 @@ ApplicationWindow {
         id: loginExist
         title: "Ошибка"
         text: "Такой логин уже существует"
+    }
+    MessageDialog {
+        id: yesFollower
+        title: "Ошибка"
+        text: "Вы уже подписаны"
+    }
+    MessageDialog {
+        id: yesRequest
+        title: "Ошибка"
+        text: "Вы уже подали запрос. Пользователь еще не подтвердил."
+    }
+    MessageDialog {
+        id: thisYou
+        title: "Ошибка"
+        text: "Ты лайки тоже сам себе ставишь?"
+    }
+    MessageDialog {
+        id: yesuser
+        title: "Пользователь найден"
+        text: "Подписаться?"
+        standardButtons: StandardButton.Yes |StandardButton.No
+        onYes: users.request(mybd.user)
+        //onNo: console.log("didn't copy")
+    }
+    MessageDialog {
+        id: giveaccess
+        title: "Пользователь хочет подписаться"
+        text: "Предоставить доступ?"
+        standardButtons: StandardButton.Yes | StandardButton.No | StandardButton.Close
+        onYes: {
+            users.giveAccess(true, mybd.user, users.getUserId(loader.item.children[0].children[2].currentIndex-1));
+            loader.item.children[0].children[2].currentIndex = 0
+
+        }
+        onNo: {
+            users.giveAccess(false, mybd.user, users.getUserId(loader.item.children[0].children[2].currentIndex-1));
+            loader.item.children[0].children[2].currentIndex = 0
+
+        }
+        onRejected: loader.item.children[0].children[2].currentIndex = 0
     }
 }
 
