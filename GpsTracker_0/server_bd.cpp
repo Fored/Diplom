@@ -17,6 +17,8 @@ server_bd::server_bd(QObject *parent) : my_bd(parent)
     server_ready = true;
     timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), this, SLOT(onlineRes()));
+    timer_sync = new QTimer(this);
+    connect(timer_sync, SIGNAL(timeout()), this, SLOT(server_sync()));
     q_route.exec("SELECT COUNT(*) FROM profile");
     q_route.next();
     if (q_route.value(0).toInt() == 1)
@@ -30,7 +32,10 @@ server_bd::server_bd(QObject *parent) : my_bd(parent)
     {
         user = 0;
     }
-    mainUrl.setUrl("http://fored.esy.es/gps.php");
+    mainUrl.setUrl("http://rhombic-subordinate.000webhostapp.com/gps.php");
+    timer_sync->start(10000);
+    current_user = 0;
+
     //q_route.exec("INSERT INTO sync (datetime) VALUES ('45')");
     //sync("2016-03-07 02:17:34");
 
@@ -42,7 +47,7 @@ void server_bd::sync()
     q_sync.exec("SELECT MAX(datetime) FROM sync");
     q_sync.next();
     max_on_my_bd = q_sync.value(0).toString();
-    qDebug() << max_on_my_bd;
+    //qDebug() << max_on_my_bd;
     if (max_on_my_bd == "")
     {
         server_ready = true;
@@ -75,8 +80,8 @@ int server_bd::test()
 
 void server_bd::server_sync()
 {
-    qDebug() << "online" << online;
-    qDebug() << "server_ready" << server_ready;
+    //qDebug() << "online" << online;
+    //qDebug() << "server_ready" << server_ready;
     if (server_ready == true)
     {
         if (online == false)
@@ -104,11 +109,11 @@ void server_bd::onlineRes(QNetworkReply *reply)
 {
     if(!reply->error()){
         online = true;
-        qDebug() << "online";
+        //qDebug() << "online";
     }
     else
     {
-        qDebug() << "offline";
+        //qDebug() << "offline";
     }
     reply->deleteLater();
     timer->stop();
@@ -131,7 +136,9 @@ void server_bd::routeServ(int u, QString min, QString max)
     urlq.addQueryItem("min", min);
     urlq.addQueryItem("max", max);
     url.setQuery(urlq);
+    qDebug() << url;
     network_select->get(QNetworkRequest(url));
+    dateDots.clear();
 }
 
 void server_bd::routeServRes(QNetworkReply *reply)
@@ -145,10 +152,26 @@ void server_bd::routeServRes(QNetworkReply *reply)
             QJsonObject subtree = ja.at(i).toObject();
             dot = QGeoCoordinate(subtree.value("latitude").toString().toDouble(), subtree.value("longitude").toString().toDouble());
             emit editDot();
+            dateDots.append(subtree.value("datetime").toString());
         }
     }
     reply->deleteLater();
     emit routeServResEnd();
+}
+
+QString server_bd::getDateDot(int i)
+{
+    return dateDots.at(i);
+}
+
+int server_bd::getCurrent_user()
+{
+    return current_user;
+}
+
+void server_bd::setCurrent_user(int u)
+{
+    current_user = u;
 }
 
 void server_bd::insertDot(int user, QString cur_time, QString latitude, QString longitude)
@@ -163,6 +186,7 @@ void server_bd::insertDot(int user, QString cur_time, QString latitude, QString 
     urlq.addQueryItem("longitude", longitude);
     //Собираем все в один Url
     url.setQuery(urlq);
+    qDebug() << url;
     networkManager->get(QNetworkRequest(url));
 }
 
@@ -214,6 +238,7 @@ void server_bd::get_max_on_server(int u)
     urlq.addQueryItem("action", "max");
     urlq.addQueryItem("user", QString::number(u));
     url.setQuery(urlq);
+    qDebug() << url;
     net_max_serv->get(QNetworkRequest(url));
 }
 

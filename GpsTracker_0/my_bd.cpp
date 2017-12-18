@@ -6,7 +6,7 @@ my_bd::my_bd(QObject *parent) :
 {
     left_sync = 0;
     db_record = QSqlDatabase::addDatabase("QSQLITE","OTHER");
-    db_record.setDatabaseName("my_bd.db");
+    db_record.setDatabaseName("my_bd_new.db");
     db_record.open();
     db_route = QSqlDatabase::database("OTHER");
     q_record = QSqlQuery("", db_record);

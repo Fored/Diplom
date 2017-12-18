@@ -15,6 +15,7 @@ int main(int argc, char *argv[])
     QApplication app(argc, argv);
 
     QQmlApplicationEngine engine;
+
     //qmlRegisterType<my_bd>("ModuleBD", 1, 0, "MyBd");
     qmlRegisterType<server_bd>("ServerBD", 1, 0, "ServBd");
     qmlRegisterType<welcome>("Welcome", 1, 0, "Welcome");

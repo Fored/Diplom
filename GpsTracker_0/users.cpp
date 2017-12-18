@@ -2,7 +2,7 @@
 
 Users::Users(QObject *parent) : QObject(parent)
 {
-    mainUrl.setUrl("http://fored.esy.es/gps.php");
+    mainUrl.setUrl("http://rhombic-subordinate.000webhostapp.com/gps.php");
     network_get_friend = new QNetworkAccessManager(this);
     connect(network_get_friend, SIGNAL(finished(QNetworkReply*)), this, SLOT(getFriendRes(QNetworkReply*)));
     network_find_user = new QNetworkAccessManager(this);
@@ -26,11 +26,12 @@ void Users::getFriend(int u)
     urlq.addQueryItem("action", "getfriend");
     urlq.addQueryItem("user", QString::number(u));
     url.setQuery(urlq);
+    qDebug() << url;
     network_get_friend->get(QNetworkRequest(url));
     users.clear();
-    us.id = u;
-    us.login = "Это я";
-    users.append(us);
+    //us.id = u;
+    //us.login = "Это я";
+    //users.append(us);
 
 }
 
@@ -61,6 +62,7 @@ void Users::findUser(QString log, int fol)
     urlq.addQueryItem("login", log);
     urlq.addQueryItem("follower", QString::number(fol));
     url.setQuery(urlq);
+    qDebug() << url;
     network_find_user->get(QNetworkRequest(url));
 }
 
@@ -69,7 +71,6 @@ void Users::findUserRes(QNetworkReply *reply)
     if(!reply->error()){
         QJsonDocument document = QJsonDocument::fromJson(reply->readAll());
         // Преобразуем документ в массив
-        qDebug() << document;
         QJsonArray ja = document.array();     
         QJsonObject subtree = ja.at(0).toObject();
         foundUser = subtree.value(subtree.keys().at(0)).toString().toInt();
@@ -103,12 +104,14 @@ void Users::request(int f)
     urlq.addQueryItem("follower", QString::number(f));
     urlq.addQueryItem("datetime", QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss"));
     url.setQuery(urlq);
+    qDebug() << url;
     network_request->get(QNetworkRequest(url));
 }
 
 void Users::requestRes(QNetworkReply *reply)
 {
     emit giveAccessyesno();
+    reply->deleteLater();
 }
 
 void Users::getRequest(int u)
@@ -118,6 +121,7 @@ void Users::getRequest(int u)
     urlq.addQueryItem("action", "getrequest");
     urlq.addQueryItem("user", QString::number(u));
     url.setQuery(urlq);
+    qDebug() << url;
     network_get_request->get(QNetworkRequest(url));
     users.clear();
 }
@@ -151,6 +155,7 @@ void Users::giveAccess(bool yn, int u, int fol)
         urlq.addQueryItem("follower", QString::number(fol));
         urlq.addQueryItem("datetime", QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss"));
         url.setQuery(urlq);
+        qDebug() << url;
         network_request->get(QNetworkRequest(url));
         qDebug() << url;
     }
@@ -163,12 +168,17 @@ void Users::giveAccess(bool yn, int u, int fol)
         urlq.addQueryItem("follower", QString::number(fol));
         //urlq.addQueryItem("datetime", QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss"));
         url.setQuery(urlq);
+        qDebug() << url;
         network_request->get(QNetworkRequest(url));
     }
 }
 
 int Users::getUserId(int index)
 {
-    return users.at(index).id;
+    if (users.length() > index)
+    {
+        return users.at(index).id;
+    }
+    else return 0;
 }
 

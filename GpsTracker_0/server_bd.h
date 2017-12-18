@@ -7,13 +7,14 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QTimer>
+#include <QVector>
 #include "my_bd.h"
-
 
 class server_bd : public my_bd
 {
     Q_OBJECT
     Q_PROPERTY(int user READ getUser WRITE setUser/*NOTIFY loginOk*/)
+    Q_PROPERTY(int current_user READ getCurrent_user WRITE setCurrent_user)
 
 public:
     explicit server_bd(QObject *parent = 0);
@@ -21,6 +22,8 @@ public:
     void insertDot(int user, QString cur_time, QString latitude, QString longitude);
     int getUser();
     void setUser(int u);
+    int getCurrent_user();
+    void setCurrent_user(int u);
 
 signals:
     void routeServResEnd();
@@ -37,7 +40,7 @@ public slots:
     void onlineRes();
     void routeServ(int u, QString min, QString max);
     void routeServRes(QNetworkReply *reply);
-
+    QString getDateDot(int i);
 
 private:
     QSqlQuery q_sync;
@@ -49,9 +52,12 @@ private:
     bool online;
     bool server_ready;
     QTimer *timer;
+    QTimer *timer_sync;
     bool login;
     int user;
+    int current_user;
     QUrl mainUrl;
+    QVector<QString> dateDots;
 };
 
 #endif // SERVER_BD_H

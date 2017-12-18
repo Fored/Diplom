@@ -7,7 +7,8 @@ SOURCES += main.cpp \
     server_bd.cpp \
     welcome.cpp \
     vk_login.cpp \
-    users.cpp
+    users.cpp \
+    database.cpp
 
 RESOURCES += qml.qrc
 
@@ -24,5 +25,6 @@ HEADERS += \
     server_bd.h \
     welcome.h \
     vk_login.h \
-    users.h
+    users.h \
+    database.h
 

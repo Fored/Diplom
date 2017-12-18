@@ -8,7 +8,7 @@ welcome::welcome(QObject *parent) : QObject(parent)
     connect(timer, SIGNAL(timeout()), this, SLOT(timeout()));
     network_signup = new QNetworkAccessManager(this);
     connect(network_signup, SIGNAL(finished(QNetworkReply*)), this, SLOT(signupRes(QNetworkReply*)));
-    mainUrl.setUrl("http://fored.esy.es/gps.php");
+    mainUrl.setUrl("http://rhombic-subordinate.000webhostapp.com/gps.php");
 }
 
 void welcome::loginRes(QNetworkReply *reply)
