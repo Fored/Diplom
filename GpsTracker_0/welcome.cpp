@@ -20,13 +20,13 @@ void welcome::loginRes(QNetworkReply *reply)
         // Преобразуем документ в массив
         QJsonArray ja = document.array();
         QJsonObject obj = ja.at(0).toObject();
-        qDebug() << obj.keys().at(0);
-        qDebug() << obj.value(obj.keys().at(0)).toString().toInt();
+        qDebug() << "(qDeb)=> welcome::loginRes " << obj.keys().at(0);
+        qDebug() << "(qDeb)=> welcome::loginRes " << obj.value(obj.keys().at(0)).toString().toInt();
 
         if (obj.value(obj.keys().at(0)).toString().toInt() == 1)
         {
             user = obj.value("id").toString().toInt();
-            qDebug() << user;
+            qDebug() << "(qDeb)=> welcome::loginRes " << user;
             emit loginOk();
         }
         else
@@ -56,7 +56,7 @@ void welcome::signup(QString log, QString pass)
     urlq.addQueryItem("login", log);
     urlq.addQueryItem("password", pass);
     url.setQuery(urlq);
-    qDebug() << url;
+    qDebug() << "(qDeb)=> welcome::signup " << url;
     network_signup->get(QNetworkRequest(url));
     timer->start(10000);
 }
@@ -70,12 +70,12 @@ void welcome::signupRes(QNetworkReply *reply)
         // Преобразуем документ в массив
         QJsonArray ja = document.array();
         QJsonObject obj = ja.at(0).toObject();
-        qDebug() << obj.value(obj.keys().at(0)).toString().toInt();
+        qDebug() << "(qDeb)=> welcome::signupRes " << obj.value(obj.keys().at(0)).toString().toInt();
 
         if (obj.value(obj.keys().at(0)).toString().toInt() > 0)
         {
             user = obj.value(obj.keys().at(0)).toString().toInt();
-            qDebug() << user;
+            qDebug() << "(qDeb)=> welcome::signupRes " << user;
             emit loginOk();
         }
         else
@@ -103,8 +103,8 @@ void welcome::login(QString log, QString pass)
     urlq.addQueryItem("action", "login");
     urlq.addQueryItem("login", log);
     urlq.addQueryItem("password", pass);
-    url.setQuery(urlq);
-    qDebug() << url;
+    url.setQuery(urlq);    
+    qDebug() << "(qDeb)=> welcome::login " << url;
     networkManager->get(QNetworkRequest(url));
     timer->start(10000);
 }

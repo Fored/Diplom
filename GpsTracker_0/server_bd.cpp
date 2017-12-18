@@ -26,7 +26,7 @@ server_bd::server_bd(QObject *parent) : my_bd(parent)
         q_route.exec("SELECT id FROM profile");
         q_route.next();
         user = q_route.value(0).toInt();
-        qDebug() << user;
+        qDebug() << "(qDeb)=> " << user;
     }
     else
     {
@@ -124,7 +124,7 @@ void server_bd::onlineRes()
 {
     timer->stop();
     server_ready = true;
-    qDebug() << "offline->timeout";
+    qDebug() << "(qDeb)=> " << "offline->timeout";
 }
 
 void server_bd::routeServ(int u, QString min, QString max)
@@ -136,7 +136,7 @@ void server_bd::routeServ(int u, QString min, QString max)
     urlq.addQueryItem("min", min);
     urlq.addQueryItem("max", max);
     url.setQuery(urlq);
-    qDebug() << url;
+    qDebug() << "(qDeb)=> routeServ: " << url;
     network_select->get(QNetworkRequest(url));
     dateDots.clear();
 }
@@ -186,7 +186,7 @@ void server_bd::insertDot(int user, QString cur_time, QString latitude, QString 
     urlq.addQueryItem("longitude", longitude);
     //Собираем все в один Url
     url.setQuery(urlq);
-    qDebug() << url;
+    qDebug() << "(qDeb)=> insertDot: " << url;
     networkManager->get(QNetworkRequest(url));
 }
 
@@ -238,7 +238,7 @@ void server_bd::get_max_on_server(int u)
     urlq.addQueryItem("action", "max");
     urlq.addQueryItem("user", QString::number(u));
     url.setQuery(urlq);
-    qDebug() << url;
+    qDebug() << "(qDeb)=> get_max_on_server: " << url;
     net_max_serv->get(QNetworkRequest(url));
 }
 
@@ -252,7 +252,7 @@ void server_bd::get_max_on_serverRes(QNetworkReply *reply)
         QJsonArray ja = document.array();
         QJsonObject r = ja.at(0).toObject();
         max_on_server = r.value(r.keys().at(0)).toString();
-        qDebug() << max_on_server;
+        qDebug() << "(qDeb)=> " << max_on_server;
         /* Если во время синхронизации приложение отключили, то максимальное
         datetime на сервере не совпадает с минимальным datetime в таблице sync.
         Поэтому очистим, то что успели синхронизировать из sync*/

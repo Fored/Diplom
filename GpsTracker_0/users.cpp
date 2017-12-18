@@ -26,7 +26,7 @@ void Users::getFriend(int u)
     urlq.addQueryItem("action", "getfriend");
     urlq.addQueryItem("user", QString::number(u));
     url.setQuery(urlq);
-    qDebug() << url;
+    qDebug() << "(qDeb)=> getFriend: " << url;
     network_get_friend->get(QNetworkRequest(url));
     users.clear();
     //us.id = u;
@@ -62,7 +62,7 @@ void Users::findUser(QString log, int fol)
     urlq.addQueryItem("login", log);
     urlq.addQueryItem("follower", QString::number(fol));
     url.setQuery(urlq);
-    qDebug() << url;
+    qDebug() << "(qDeb)=> findUser: " << url;
     network_find_user->get(QNetworkRequest(url));
 }
 
@@ -104,7 +104,7 @@ void Users::request(int f)
     urlq.addQueryItem("follower", QString::number(f));
     urlq.addQueryItem("datetime", QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss"));
     url.setQuery(urlq);
-    qDebug() << url;
+    qDebug() << "(qDeb)=> request: " << url;
     network_request->get(QNetworkRequest(url));
 }
 
@@ -121,7 +121,7 @@ void Users::getRequest(int u)
     urlq.addQueryItem("action", "getrequest");
     urlq.addQueryItem("user", QString::number(u));
     url.setQuery(urlq);
-    qDebug() << url;
+    qDebug() << "(qDeb)=> getRequest: " << url;
     network_get_request->get(QNetworkRequest(url));
     users.clear();
 }
@@ -155,9 +155,8 @@ void Users::giveAccess(bool yn, int u, int fol)
         urlq.addQueryItem("follower", QString::number(fol));
         urlq.addQueryItem("datetime", QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss"));
         url.setQuery(urlq);
-        qDebug() << url;
+        qDebug() << "(qDeb)=> giveAccess - yn=true: " << url;
         network_request->get(QNetworkRequest(url));
-        qDebug() << url;
     }
     else
     {
@@ -168,7 +167,7 @@ void Users::giveAccess(bool yn, int u, int fol)
         urlq.addQueryItem("follower", QString::number(fol));
         //urlq.addQueryItem("datetime", QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss"));
         url.setQuery(urlq);
-        qDebug() << url;
+        qDebug() << "(qDeb)=> giveAccess - yn=false: " << url;
         network_request->get(QNetworkRequest(url));
     }
 }

@@ -13,6 +13,7 @@
 #include <QJsonObject>
 #include <QDebug>
 #include <QCryptographicHash>
+#include <QNetworkRequest>
 
 struct vk_user
 {

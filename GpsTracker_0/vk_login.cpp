@@ -78,7 +78,7 @@ void vk_login::enddots()
     urlq.addQueryItem("action", "enddots");
     urlq.addQueryItem("user", QString::number(user));
     url.setQuery(urlq);
-    qDebug() << url;
+    qDebug() << "(qDeb)=> endDots " << url;
     network_enddots->get(QNetworkRequest(url));
 }
 
@@ -98,7 +98,7 @@ void vk_login::setAccess_token(QUrl url, int u)
         urlq.addQueryItem("id_vk", QString::number(id));
         urlq.addQueryItem("secret", secret);
         url.setQuery(urlq);
-        qDebug() << url;
+        qDebug() << "(qDeb)=> setAccess_token " << url;
         network_token->get(QNetworkRequest(url));
         emit yesVk();
     }
@@ -114,7 +114,7 @@ void vk_login::getFriend(int u)
         urlq2.addQueryItem("action", "gettoken");
         urlq2.addQueryItem("user", QString::number(u));
         url2.setQuery(urlq2);
-        qDebug() << url2;
+        qDebug() << "(qDeb)=> getFriend " << url2;
         network_gettoken->get(QNetworkRequest(url2));
     }
 }
@@ -161,7 +161,7 @@ void vk_login::gettokenRes(QNetworkReply *reply)
         urlq.addQueryItem("action", "getfriend");
         urlq.addQueryItem("user", QString::number(user));
         url.setQuery(urlq);
-        qDebug() << url;
+        qDebug() << "(qDeb)=> getTokenRes " << url;
         network_getfriend->get(QNetworkRequest(url));
     }
     reply->deleteLater();
@@ -204,7 +204,7 @@ void vk_login::getFriendRes(QNetworkReply *reply)
             QString sig = QString(QCryptographicHash::hash((md.toString()+secret).toLatin1(), QCryptographicHash::Md5).toHex());
             urlq2.addQueryItem("sig", sig);
             url2.setQuery(urlq2);
-            qDebug() << url2;
+            qDebug() << "(qDeb)=> getFriendRes " << url2;
             network_namephoto->get(QNetworkRequest(url2));
         }
         else
@@ -219,52 +219,53 @@ void vk_login::namephotoRes(QNetworkReply *reply)
 {
     if(!reply->error())
     {
-        //qDebug() << reply->readAll();
-        QJsonDocument document = QJsonDocument::fromJson(reply->readAll());
-        qDebug() << document;
-        QJsonObject root = document.object();
-        qDebug() << root;
-        QJsonArray ja = root.value("response").toArray();
-        int j = 0;
-        qDebug() << ja;
-        qDebug() << ja.count();
-        for(int i = 0; i < ja.count(); i++)
-        {            
-            QJsonObject subtree = ja.at(i).toObject();
-            if (i==0)
+        QUrl redirectUrl = reply->attribute(QNetworkRequest::RedirectionTargetAttribute).toUrl();
+        qDebug() << "(qDeb)=> vk::namephotoRes:redirectUrl " << redirectUrl;
+        if(!redirectUrl.isEmpty())
+        { //CHECK THAT URL IS VALID
+            QNetworkRequest request;
+            request.setUrl(redirectUrl);
+            network_namephoto->get(request);
+        }
+        else
+        {
+            QJsonDocument document = QJsonDocument::fromJson(reply->readAll());
+            qDebug() << document;
+            QJsonObject root = document.object();
+            qDebug() << root;
+            QJsonArray ja = root.value("response").toArray();
+            int j = 0;
+            qDebug() << ja;
+            qDebug() << ja.count();
+            for(int i = 0; i < ja.count(); i++)
             {
-                mainphoto = subtree.value("photo_200").toString();
-                qDebug() << mainphoto;
-                emit editmainphoto();
-            }
-            while (vk_users.at(j).id_vk == 0)
-            {
+                QJsonObject subtree = ja.at(i).toObject();
+                if (i==0)
+                {
+                    mainphoto = subtree.value("photo_200").toString();
+                    qDebug() << mainphoto;
+                    emit editmainphoto();
+                }
+                while (vk_users.at(j).id_vk == 0)
+                {
+                    j++;
+                }
+                vk_users[j].first_name = subtree.value("first_name").toString();
+                vk_users[j].last_name = subtree.value("last_name").toString();
+                vk_users[j].photo = subtree.value("photo_200").toString();
                 j++;
             }
-            vk_users[j].first_name = subtree.value("first_name").toString();
-            vk_users[j].last_name = subtree.value("last_name").toString();
-            vk_users[j].photo = subtree.value("photo_200").toString();
-            j++;
+            if (vk_users.length() > ind)
+            {
+                photo = vk_users.at(ind).photo;
+                name = vk_users.at(ind).last_name + " " + vk_users.at(ind).first_name;
+                login = vk_users.at(ind).login;
+                emit editphoto();
+                emit editname();
+                emit editlogin();
+                enddots();
+            }
         }
-        if (vk_users.length() > ind)
-        {
-            photo = vk_users.at(ind).photo;
-            name = vk_users.at(ind).last_name + " " + vk_users.at(ind).first_name;
-            login = vk_users.at(ind).login;
-            emit editphoto();
-            emit editname();
-            emit editlogin();
-            enddots();
-        }
-//        for(int j = 0; j < vk_users.count(); j++)
-//        {
-//            qDebug() << vk_users.at(j).id;
-//            qDebug() << vk_users.at(j).login;
-//            qDebug() << vk_users.at(j).id_vk;
-//            qDebug() << vk_users.at(j).first_name;
-//            qDebug() << vk_users.at(j).last_name;
-//            qDebug() << vk_users.at(j).photo;
-//        }
     }
     reply->deleteLater();
 }
@@ -275,7 +276,7 @@ void vk_login::enddotsRes(QNetworkReply *reply)
     {
         QJsonDocument document = QJsonDocument::fromJson(reply->readAll());
         QJsonArray ja = document.array();
-        qDebug() << ja.count();
+        qDebug() << "(qDeb)=> vk::endDotsRes " << ja.count();
         for(int i = 0; i < ja.count(); i++)
         {
             QJsonObject subtree = ja.at(i).toObject();
@@ -300,24 +301,35 @@ void vk_login::friendHereRes(QNetworkReply *reply)
 {
     if(!reply->error())
     {
-        QJsonDocument document = QJsonDocument::fromJson(reply->readAll());
-        QJsonObject root = document.object();
-        QJsonArray ja = root.value("response").toArray();
-        QString vk_friends;
-        vk_friends.append(QString::number(ja.at(0).toInt()));
-        for(int i = 1; i < ja.count(); i++)
-        {
-            vk_friends.append(",");
-            vk_friends.append(QString::number(ja.at(i).toInt()));
+        QUrl redirectUrl = reply->attribute(QNetworkRequest::RedirectionTargetAttribute).toUrl();
+        qDebug() << "(qDeb)=> vk::namephotoRes:redirectUrl " << redirectUrl;
+        if(!redirectUrl.isEmpty())
+        { //CHECK THAT URL IS VALID
+            QNetworkRequest request;
+            request.setUrl(redirectUrl);
+            network_friendhere->get(request);
         }
-        QUrl url(mainUrl);
-        QUrlQuery urlq;
-        urlq.addQueryItem("action", "friendhere");
-        urlq.addQueryItem("user", QString::number(user));
-        urlq.addQueryItem("vk_friend", vk_friends);
-        url.setQuery(urlq);
-        qDebug() << url;
-        network_vkfriend->get(QNetworkRequest(url));
+        else
+        {
+            QJsonDocument document = QJsonDocument::fromJson(reply->readAll());
+            QJsonObject root = document.object();
+            QJsonArray ja = root.value("response").toArray();
+            QString vk_friends;
+            vk_friends.append(QString::number(ja.at(0).toInt()));
+            for(int i = 1; i < ja.count(); i++)
+            {
+                vk_friends.append(",");
+                vk_friends.append(QString::number(ja.at(i).toInt()));
+            }
+            QUrl url(mainUrl);
+            QUrlQuery urlq;
+            urlq.addQueryItem("action", "friendhere");
+            urlq.addQueryItem("user", QString::number(user));
+            urlq.addQueryItem("vk_friend", vk_friends);
+            url.setQuery(urlq);
+            qDebug() << "(qDeb)=> vk::friendHereRes " << url;
+            network_vkfriend->get(QNetworkRequest(url));
+        }
     }
     reply->deleteLater();
 }
@@ -362,17 +374,28 @@ void vk_login::vkfriendnamephotoRes(QNetworkReply *reply)
 {
     if(!reply->error())
     {
-        QJsonDocument document = QJsonDocument::fromJson(reply->readAll());
-        QJsonObject root = document.object();
-        QJsonArray ja = root.value("response").toArray();
-        for(int i = 0; i < ja.count(); i++)
+        QUrl redirectUrl = reply->attribute(QNetworkRequest::RedirectionTargetAttribute).toUrl();
+        qDebug() << "(qDeb)=> vk::namephotoRes:redirectUrl " << redirectUrl;
+        if(!redirectUrl.isEmpty())
+        { //CHECK THAT URL IS VALID
+            QNetworkRequest request;
+            request.setUrl(redirectUrl);
+            network_vkfriendnamephoto->get(request);
+        }
+        else
         {
-            QJsonObject subtree = ja.at(i).toObject();
-            here_name = subtree.value("last_name").toString() + " " + subtree.value("first_name").toString();
-            here_photo = subtree.value("photo_200").toString();
-            here_login = frHere.at(i).login;
-            emit editherefriend();
+            QJsonDocument document = QJsonDocument::fromJson(reply->readAll());
+            QJsonObject root = document.object();
+            QJsonArray ja = root.value("response").toArray();
+            for(int i = 0; i < ja.count(); i++)
+            {
+                QJsonObject subtree = ja.at(i).toObject();
+                here_name = subtree.value("last_name").toString() + " " + subtree.value("first_name").toString();
+                here_photo = subtree.value("photo_200").toString();
+                here_login = frHere.at(i).login;
+                emit editherefriend();
 
+            }
         }
     }
     reply->deleteLater();
